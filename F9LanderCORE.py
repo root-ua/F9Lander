@@ -354,7 +354,10 @@ class Simulation(object):
         self.address = options.address
         #
         self.display = options.display
-        #
+
+        # Enable/disable real-time object rendering. Turning off can speed-up the computation
+        self.ui = True
+
         if self.display:
             pygame.init()
             self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), 0, 32)
@@ -467,7 +470,7 @@ class Simulation(object):
                 vertices = [(entity.body.transform * v) * self.pixels_per_meter for v in shape.vertices]
                 vertices = [(v[0], self.screen_height - v[1]) for v in vertices]
                 # self.colors[entity.body.type]
-                if self.display:
+                if self.display and self.ui:
                     pygame.draw.polygon(self.screen, entity.color, vertices)
                     # debug
                     if False:
@@ -506,7 +509,7 @@ class Simulation(object):
         world_obj.world.ClearForces()   # but why?
         #
         self.message += " | Step: " + str(self.step_number)
-        if self.display:
+        if self.display and self.ui:
             self.label = self.myfont.render(self.message, True, (255, 255, 255), (0, 0, 0))
             self.screen.blit(self.label, (10, 10))
             pygame.display.flip()
@@ -539,6 +542,11 @@ class Simulation(object):
                     simulation_array = self.__restart__(world_obj, simulation_array)
                     print "A: Bodies, objects", len(world_obj.world.bodies), len(simulation_array)
                     # here was code from __restart__()
+                if event.type == KEYDOWN and event.key == K_t:
+                    if self.ui:
+                        self.ui = False
+                    else:
+                        self.ui = True
         return report_list
 
 # -------------------------------------------------- #
